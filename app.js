@@ -29,6 +29,24 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
+app.get('/api/v1/tours/:id', (req, res) => {
+  const id = req.params.id * 1; // left as it is would be a string, we convert it automatically to a number
+  const tour = tours.find((el) => el.id === id);
+
+  if (!tour)
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour,
+    },
+  });
+});
+
 app.post('/api/v1/tours', (req, res) => {
   // console.log(req.body);
 
@@ -50,11 +68,8 @@ app.post('/api/v1/tours', (req, res) => {
   );
 });
 
-app.get('/api/v1/tours/:id', (req, res) => {
-  const id = req.params.id * 1; // left as it is would be a string, we convert it automatically to a number
-  const tour = tours.find((el) => el.id === id);
-
-  if (!tour)
+app.patch('/api/v1/tours/:id', (req, res) => {
+  if (!req.params.id * 1 > tours.length)
     return res.status(404).json({
       status: 'fail',
       message: 'Invalid ID',
@@ -63,8 +78,21 @@ app.get('/api/v1/tours/:id', (req, res) => {
   res.status(200).json({
     status: 'success',
     data: {
-      tour,
+      tour: '<Updated tour here...>',
     },
+  });
+});
+
+app.delete('/api/v1/tours/:id', (req, res) => {
+  if (!req.params.id * 1 > tours.length)
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  // 204 because the data no longer exists as we deleted it
+  res.status(204).json({
+    status: 'success',
+    data: null,
   });
 });
 
