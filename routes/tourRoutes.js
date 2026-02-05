@@ -8,7 +8,7 @@ router.param('id', tourController.checkID);
 router
   .route('/')
   .get(tourController.getAllTours)
-  .post(tourController.createTour);
+  .post(tourController.checkBody, tourController.createTour); // first we run our custom middleware, then the createTour function
 
 router
   .route('/:id')

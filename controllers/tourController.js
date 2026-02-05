@@ -5,12 +5,21 @@ const tours = JSON.parse(
 );
 
 exports.checkID = (req, res, next, value) => {
-  // this is the param middleware and as such, the 4th argument is the
+  // this is the function we'll pass to the param middleware and as such, the 4th argument is the
   // value of the parameter itself, in this case, the id
   if (value * 1 > tours.length)
     return res.status(404).json({
       status: 'fail',
       message: 'Invalid ID',
+    });
+  next();
+};
+
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price)
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Missing name or price',
     });
   next();
 };
