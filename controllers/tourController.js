@@ -38,7 +38,14 @@ exports.getAllTours = async (req, res) => {
       (matchedKeyword) => `$${matchedKeyword}`,
     ); // match the following operators: gte, gt, lte, lt and replace them with the mongoose $ operator
 
-    const query = Tour.find(JSON.parse(queryString));
+    let query = Tour.find(JSON.parse(queryString));
+
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt'); // createdAt descending order
+    }
 
     /*const query = await Tour.find()
       .where('duration')
