@@ -1,10 +1,11 @@
-const fs = require('fs');
+const Tour = require('../models/tourModel');
 
+/*
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`),
 );
-
-exports.checkID = (req, res, next, value) => {
+*/
+/*exports.checkID = (req, res, next, value) => {
   // this is the function we'll pass to the param middleware and as such, the 4th argument is the
   // value of the parameter itself, in this case, the id
   if (value * 1 > tours.length)
@@ -22,51 +23,49 @@ exports.checkBody = (req, res, next) => {
       message: 'Missing name or price',
     });
   next();
-};
+};*/
 
 exports.getAllTours = (req, res) => {
   console.log(req.requestTime);
 
   res.status(200).json({
     status: 'success',
-    results: tours.length,
+    /*results: tours.length,
     data: {
       tours,
     },
+    */
   });
 };
 
 exports.getTour = (req, res) => {
   const id = req.params.id * 1; // left as it is would be a string, we convert it automatically to a number
-  const tour = tours.find((el) => el.id === id);
+  /*const tour = tours.find((el) => el.id === id);
 
   res.status(200).json({
     status: 'success',
     data: {
       tour,
     },
-  });
+  });*/
 };
 
-exports.createTour = (req, res) => {
-  // console.log(req.body);
+exports.createTour = async (req, res) => {
+  try {
+    const newTour = await Tour.create(req.body);
 
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body); // merges 2 objects into 1
-
-  tours.push(newTour);
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({
-        status: 'success',
-        data: {
-          tour: newTour,
-        },
-      }); // 200 means ok, 201 means created
-    },
-  );
+    res.status(201).json({
+      status: 'success',
+      data: {
+        tour: newTour,
+      },
+    }); // 200 means ok, 201 means created
+  } catch (err) {
+    res.status(400).json({
+      status: 'failed',
+      message: 'Invalid data sent!', // TO DO: Handle error later
+    });
+  }
 };
 
 exports.updateTour = (req, res) => {
