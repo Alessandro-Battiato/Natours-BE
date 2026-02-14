@@ -32,7 +32,13 @@ exports.getAllTours = async (req, res) => {
 
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    const query = Tour.find(queryObj);
+    let queryString = JSON.stringify(queryObj);
+    queryString = queryString.replace(
+      /\b(gte|gt|lte|lt)\b/g,
+      (matchedKeyword) => `$${matchedKeyword}`,
+    ); // match the following operators: gte, gt, lte, lt and replace them with the mongoose $ operator
+
+    const query = Tour.find(JSON.parse(queryString));
 
     /*const query = await Tour.find()
       .where('duration')
