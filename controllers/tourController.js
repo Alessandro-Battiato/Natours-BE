@@ -47,6 +47,13 @@ exports.getAllTours = async (req, res) => {
       query = query.sort('-createdAt'); // createdAt descending order
     }
 
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields); // only return the selected fields
+    } else {
+      query = query.select('-__v'); // because of the - we get everything EXCEPT the v field
+    }
+
     /*const query = await Tour.find()
       .where('duration')
       .equals(5)
