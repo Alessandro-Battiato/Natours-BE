@@ -54,6 +54,10 @@ const tourSchema = new mongoose.Schema(
       select: false, // hides field from the returned data
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false, // USUALLY tours are not secret and thus open to the public for normal requests
+    },
   },
   {
     toJSON: { virtuals: true }, // this is how you "enable" the virtuals
@@ -83,6 +87,24 @@ tourSchema.pre('save', function (next) {
 tourSchema.post('save', function (doc, next) {
   // the doc parameter is the newly created document
 
+  next();
+});
+*/
+
+//tourSchema.pre('find', function (next) {
+// we use a regex here to cover all of the find cases, meaning this query middleware will run for normal get requests and also get by id requests, otherwise we would have needed a separate middleware with the findOne parameter
+tourSchema.pre(/^find/, function (next) {
+  // the find keyword turns the pre middleware into a query middleware, this means that by using the find keyword, we are now looking at the query instead of a document
+  // in this fictional use case, we are using this middleware to filter secret tours from the results, reserved for VIP members only
+  this.find({ secretTour: { $ne: true } }); // find tours which have secret tour prop NOT EQUAL to true
+
+  this.start = Date.now();
+  next();
+});
+
+/*
+tourSchema.post(/^find/, function (docs, next) {
+  // we have access to ALL of the documents that have matched the query because are using the find parameter here as well
   next();
 });
 */
