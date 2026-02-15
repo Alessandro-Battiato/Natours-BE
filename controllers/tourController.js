@@ -233,3 +233,63 @@ exports.getTourStats = async (req, res) => {
     });
   }
 };
+
+exports.getMonthlyPlan = async (req, res) => {
+  // Custom endpoint to get the busiest months of this fake Natours business
+  try {
+    const year = req.params.year * 1;
+
+    const plan = await Tour.aggregate([
+      {
+        $unwind: '$startDates',
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: '$startDates' },
+          numTourStarts: {
+            $sum: 1,
+          },
+          tours: {
+            $push: '$name',
+          },
+        },
+      },
+      {
+        $addFields: {
+          month: '$_id',
+        },
+      },
+      {
+        $project: {
+          _id: 0, // this field will no longer show up in the results, if you set it to 1 the opposite would happen
+        },
+      },
+      {
+        $sort: {
+          numTourStarts: -1, // descending order, the highest number of num tour starts
+        },
+      },
+      {
+        $limit: 12, // result limit
+      },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: plan,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
