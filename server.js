@@ -20,6 +20,16 @@ const app = require('./app');
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App running on port ${port}`);
+});
+
+// Handle ALL promise rejections here
+process.on('unhandledRejection', (err) => {
+  console.log(err.name, err.message);
+  console.log('UNHANDLER REJECTION! Shutting down...');
+  server.close(() => {
+    // server close gives time to the server to close "gracefully" because doing only process.exit(1) closes the server abruptly, without caring for pending requests for instance
+    process.exit(1);
+  });
 });
