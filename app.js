@@ -1,6 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 
@@ -38,25 +40,13 @@ app.all('*', (req, res, next) => {
     status: 'fail',
     message: `Can't find ${req.originalUrl} on this server!`,
   });*/
-  const err = new Error(`Can't find ${req.originalUrl} on this server!`);
+  /*const err = new Error(`Can't find ${req.originalUrl} on this server!`);
   err.status = 'fail';
-  err.statusCode = 404;
+  err.statusCode = 404;*/
 
-  next(err);
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`));
 });
 
-app.use((err, req, res, next) => {
-  // By specifying 4 arguments (and in this case the first one becomes the error)
-  // express AUTOMATICALLY recognizes this middleware as an error middleware and treats it as one
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || 'error';
-
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-  });
-
-  // key note: whenever we pass ANYTHING into the next() function, express assumes it is an error and will send the error to the global error handling middleware, skipping all the other middlewares
-});
+app.use(globalErrorHandler);
 
 module.exports = app;
