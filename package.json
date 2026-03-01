@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Alessandro-Battiato/Natours-BE#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "express": "^4.22.1",
     "mongoose": "^5.13.23",
