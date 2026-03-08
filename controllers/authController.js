@@ -1,6 +1,18 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
+
+const signToken = (id) =>
+  jwt.sign(
+    {
+      id,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    },
+  );
 
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
@@ -10,15 +22,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
   });
 
-  const token = jwt.sign(
-    {
-      id: newUser._id,
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    },
-  );
+  const token = signToken(newUser._id);
 
   res.status(201).json({
     status: 'success',
@@ -29,4 +33,25 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 
   next();
+});
+
+exports.login = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    // The global error middleware is going to pick the newly created error here
+    return next(new AppError('Please provide email and password!', 400));
+  }
+
+  const user = await User.findOne({ email }).select('+password'); // this way the password will be back in the output;
+
+  if (!user || !(await user.correctPassword(password, user.password))) {
+    return next(new AppError('Incorrect email or password', 401)); // Unauthorized
+  }
+
+  const token = signToken(user._id);
+  res.status(200).json({
+    status: 'success',
+    token,
+  });
 });

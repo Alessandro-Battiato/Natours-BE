@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a password'],
     minlength: 8, // it has been found that the safest passwords are usually the longest ones, not the crazy ones with special characters or anything like that, that is why we are only imposing a min length as a requirement
+    select: false, // this way the password won't show in any output of our requests (such as get users), very important for security purposes
   },
   passwordConfirm: {
     type: String,
@@ -44,6 +45,14 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirm = undefined; // of course the hashed password will not be equal to the old user's password so we no longer need this validation field
   next();
 });
+
+// The following is an instant method, a method immediately available on all documents of a certain collection
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword,
+) {
+  return await bcrypt.compare(candidatePassword, userPassword); // returns true if the 2 arguments are the same
+};
 
 const User = mongoose.model('User', userSchema);
 

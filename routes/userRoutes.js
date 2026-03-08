@@ -4,8 +4,9 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-// The following DOES NOT follow the RESTful principle regarding names because the signup rout HAS to do with the performed action but it's fine in this scenario
+// The following DO NOT follow the RESTful principle regarding names because the signup rout HAS to do with the performed action but it's fine in this scenario
 router.post('/signup', authController.signup);
+router.post('/login', authController.login);
 
 // The following DO follow the RESTful principle of rout names not having anything to do with the performed action
 router
