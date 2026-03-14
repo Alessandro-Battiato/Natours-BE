@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
@@ -38,6 +39,8 @@ const userSchema = new mongoose.Schema({
     },
   },
   passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 });
 
 // Between getting the data, and saving it to the database, we are running the following middleware
@@ -49,6 +52,13 @@ userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, 12); // second argument is salt, random string added to our password, the higher this argument is, the more CPU intensive this operation becomes
 
   this.passwordConfirm = undefined; // of course the hashed password will not be equal to the old user's password so we no longer need this validation field
+  next();
+});
+
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000; // - 1000 avoids any possible errors that might occur due to db operations being slower than jwt
   next();
 });
 
@@ -72,6 +82,19 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 
   // False means password NOT changed
   return false;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);
