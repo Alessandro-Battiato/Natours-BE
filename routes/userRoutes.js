@@ -11,6 +11,12 @@ router.post('/login', authController.login);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
+router.patch(
+  '/updateMyPassword',
+  authController.protect,
+  authController.updatePassword,
+);
+
 // The following DO follow the RESTful principle of rout names not having anything to do with the performed action
 router
   .route('/')
