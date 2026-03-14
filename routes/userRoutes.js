@@ -17,6 +17,8 @@ router.patch(
   authController.updatePassword,
 );
 
+router.patch('/updateMe', authController.protect, userController.updateMe);
+
 // The following DO follow the RESTful principle of rout names not having anything to do with the performed action
 router
   .route('/')
