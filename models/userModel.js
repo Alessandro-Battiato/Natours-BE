@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords are not the same!',
     },
   },
+  passwordChangedAt: Date,
 });
 
 // Between getting the data, and saving it to the database, we are running the following middleware
@@ -52,6 +53,20 @@ userSchema.methods.correctPassword = async function (
   userPassword,
 ) {
   return await bcrypt.compare(candidatePassword, userPassword); // returns true if the 2 arguments are the same
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  // Remember this is an instance method so 'this' points to the current document
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10,
+    );
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  // False means password NOT changed
+  return false;
 };
 
 const User = mongoose.model('User', userSchema);
