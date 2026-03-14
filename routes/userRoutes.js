@@ -18,6 +18,7 @@ router.patch(
 );
 
 router.patch('/updateMe', authController.protect, userController.updateMe);
+router.delete('/deleteMe', authController.protect, userController.deleteMe);
 
 // The following DO follow the RESTful principle of rout names not having anything to do with the performed action
 router
