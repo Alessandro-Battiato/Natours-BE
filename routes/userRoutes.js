@@ -11,20 +11,15 @@ router.post('/login', authController.login);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-router.patch(
-  '/updateMyPassword',
-  authController.protect,
-  authController.updatePassword,
-);
+router.use(authController.protect); // this will protect ALL the routes that come AFTER this point, so the 4 requests behind this middleware are NOT protected
 
-router.get(
-  '/me',
-  authController.protect,
-  userController.getMe,
-  userController.getUser,
-);
-router.patch('/updateMe', authController.protect, userController.updateMe);
-router.delete('/deleteMe', authController.protect, userController.deleteMe);
+router.patch('/updateMyPassword', authController.updatePassword);
+
+router.get('/me', userController.getMe, userController.getUser);
+router.patch('/updateMe', userController.updateMe);
+router.delete('/deleteMe', userController.deleteMe);
+
+router.use(authController.restrictTo('admin')); // following requests can only be made by admins
 
 // The following DO follow the RESTful principle of rout names not having anything to do with the performed action
 router
