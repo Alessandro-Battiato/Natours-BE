@@ -88,6 +88,8 @@ const tourSchema = new mongoose.Schema(
   },
 );
 
+tourSchema.index({ price: 1 }); // mongodb engine performance optimization, but the index method also accepts other useful arguments such as a second object { unique: true } which could be used to store only unique reviews and prevent users from submitting the same reviews more than once
+
 // knowing the duration in weeks is business logic cause it has to do with the business itself,
 // and since we need to follow the "fat models, thin controllers" principle
 // we calculate this custom field here using virtuals which is useful for this reason
