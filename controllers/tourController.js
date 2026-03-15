@@ -1,7 +1,5 @@
 const Tour = require('../models/tourModel');
-const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
 /*
@@ -36,84 +34,92 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  /*const queryObj = { ...req.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+exports.getAllTours = factory.getAll(Tour);
 
-    excludedFields.forEach((el) => delete queryObj[el]);
+/*
+  exports.getAllTours = catchAsync(async (req, res, next) => {
+    /*const queryObj = { ...req.query };
+      const excludedFields = ['page', 'sort', 'limit', 'fields'];
 
-    let queryString = JSON.stringify(queryObj);
-    queryString = queryString.replace(
-      /\b(gte|gt|lte|lt)\b/g,
-      (matchedKeyword) => `$${matchedKeyword}`,
-    ); // match the following operators: gte, gt, lte, lt and replace them with the mongoose $ operator
+      excludedFields.forEach((el) => delete queryObj[el]);
 
-    let query = Tour.find(JSON.parse(queryString));*/
+      let queryString = JSON.stringify(queryObj);
+      queryString = queryString.replace(
+        /\b(gte|gt|lte|lt)\b/g,
+        (matchedKeyword) => `$${matchedKeyword}`,
+      ); // match the following operators: gte, gt, lte, lt and replace them with the mongoose $ operator
 
-  /*if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort('-createdAt'); // createdAt descending order
-    }*/
+      let query = Tour.find(JSON.parse(queryString));*/
 
-  /*if (req.query.fields) {
-      const fields = req.query.fields.split(',').join(' ');
-      query = query.select(fields); // only return the selected fields
-    } else {
-      query = query.select('-__v'); // because of the - we get everything EXCEPT the v field
-    }*/
+/*if (req.query.sort) {
+        const sortBy = req.query.sort.split(',').join(' ');
+        query = query.sort(sortBy);
+      } else {
+        query = query.sort('-createdAt'); // createdAt descending order
+      }*/
 
-  // Pagination, skip is useful to return the requested results based on the requested page (e.g for page 2 we need to skip the first 10 results)
-  /*const page = req.query.page * 1 || 1; // convert to a number or set 1 by default
-    const limit = req.query.limit * 1 || 100;
-    const skip = (page - 1) * limit;
+/*if (req.query.fields) {
+        const fields = req.query.fields.split(',').join(' ');
+        query = query.select(fields); // only return the selected fields
+      } else {
+        query = query.select('-__v'); // because of the - we get everything EXCEPT the v field
+      }*/
 
-    query = query.skip(skip).limit(limit);
+// Pagination, skip is useful to return the requested results based on the requested page (e.g for page 2 we need to skip the first 10 results)
+/*const page = req.query.page * 1 || 1; // convert to a number or set 1 by default
+      const limit = req.query.limit * 1 || 100;
+      const skip = (page - 1) * limit;
 
-    if (req.query.page) {
-      const numTours = await Tour.countDocuments(); // returns the number of documents
-      if (skip >= numTours) throw new Error('This page does not exist'); // throw Error as to trigger the catch block where we handle the error
-    }*/
+      query = query.skip(skip).limit(limit);
 
-  /*const query = await Tour.find()
-      .where('duration')
-      .equals(5)
-      .where('difficulty')
-      .equals('easy');*/
+      if (req.query.page) {
+        const numTours = await Tour.countDocuments(); // returns the number of documents
+        if (skip >= numTours) throw new Error('This page does not exist'); // throw Error as to trigger the catch block where we handle the error
+      }*/
 
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tours = await features.query;
+/*const query = await Tour.find()
+        .where('duration')
+        .equals(5)
+        .where('difficulty')
+        .equals('easy');
 
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      tours,
-    },
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const tours = await features.query;
+
+    res.status(200).json({
+      status: 'success',
+      results: tours.length,
+      data: {
+        tours,
+      },
+    });
   });
-});
+*/
 
-exports.getTour = catchAsync(async (req, res, next) => {
-  // const id = req.params.id * 1; // left as it is would be a string, we convert it automatically to a number
-  /*const tour = tours.find((el) => el.id === id);*/
-  const tour = await Tour.findById(req.params.id);
+exports.getTour = factory.getOne(Tour, { path: 'reviews' });
 
-  if (!tour) {
-    return next(new AppError(`No tour found with that ID`, 404));
-  }
+/*
+  exports.getTour = catchAsync(async (req, res, next) => {
+    // const id = req.params.id * 1; // left as it is would be a string, we convert it automatically to a number
+    /*const tour = tours.find((el) => el.id === id);
+    const tour = await Tour.findById(req.params.id);
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
+    if (!tour) {
+      return next(new AppError(`No tour found with that ID`, 404));
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour,
+      },
+    });
   });
-});
+*/
 
 exports.createTour = factory.createOne(Tour);
 
