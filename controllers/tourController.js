@@ -115,42 +115,50 @@ exports.getTour = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
+exports.createTour = factory.createOne(Tour);
 
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: newTour,
-    },
-  }); // 200 means ok, 201 means created
-  /*try {
-    
-  } catch (err) {
-    res.status(400).json({
-      status: 'failed',
-      message: 'Invalid data sent!', // TO DO: Handle error later
+/*
+  exports.createTour = catchAsync(async (req, res, next) => {
+    const newTour = await Tour.create(req.body);
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        tour: newTour,
+      },
+    }); // 200 means ok, 201 means created
+    /*try {
+      
+    } catch (err) {
+      res.status(400).json({
+        status: 'failed',
+        message: 'Invalid data sent!', // TO DO: Handle error later
+      });
+    }
+  });
+*/
+
+exports.updateTour = factory.updateOne(Tour);
+
+/*
+  exports.updateTour = catchAsync(async (req, res, next) => {
+    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true, // the updated document will be the one returned by the request this way, more info on the options set here can be found in the mongoose official docs
+      runValidators: true,
     });
-  } */
-});
 
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true, // the updated document will be the one returned by the request this way, more info on the options set here can be found in the mongoose official docs
-    runValidators: true,
+    if (!tour) {
+      return next(new AppError(`No tour found with that ID`, 404));
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour,
+      },
+    });
   });
-
-  if (!tour) {
-    return next(new AppError(`No tour found with that ID`, 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
+*/
 
 // Thanks to JS Closures, we pass the Model to the factory function that will basically return the same deleteTour function we commented beneath
 exports.deleteTour = factory.deleteOne(Tour);
