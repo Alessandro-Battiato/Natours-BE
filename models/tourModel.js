@@ -84,6 +84,7 @@ const tourSchema = new mongoose.Schema(
   },
   {
     toJSON: { virtuals: true }, // this is how you "enable" the virtuals
+    toObject: { virtuals: true },
   },
 );
 
