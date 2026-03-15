@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
-const User = require('./userModel');
+// const User = require('./userModel'); Not needed for the normalized approach
 
 const tourSchema = new mongoose.Schema(
   {
@@ -54,7 +54,10 @@ const tourSchema = new mongoose.Schema(
         message: 'Discount price ({VALUE}) should be below regular price', // MONGOOSE gives us access to the current VALUE so we can use it this way inside the string
       },
     },
-    guides: Array,
+    // The following was the embedded approach, so instead of having isolated documents of tours and their users, we had everything in one place
+    // guides: Array,
+    // The following method instead is the referencing (or normalized) version, the one used by default in relational databases, so isolated entities, foreign keys etc.
+    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
     summary: {
       type: String,
       trim: [true, 'A tour must have a description'],
@@ -98,6 +101,7 @@ tourSchema.pre('save', function (next) {
   next(); // similar to the next middlewares of express, we need to invoke this here
 }); // pre is a middleware that runs before an event, the event is the one specified as the argument of the function so in this case, the function callback we are passing will be called BEFORE we SAVE something in the db
 
+/* The following was the embedded approach, so instead of having isolated documents of tours and their users, we had everything in one place
 tourSchema.pre('save', async function (next) {
   // guides is going to be an Array of Promises resulting in user ids
   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
@@ -105,6 +109,7 @@ tourSchema.pre('save', async function (next) {
 
   next();
 });
+*/
 
 /*
 tourSchema.pre('save', function (next) {
