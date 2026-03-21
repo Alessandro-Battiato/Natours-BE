@@ -49,6 +49,12 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
   });
 
+  /*
+    using Email class with pug templates
+    const url = `${req.protocol}://${req.get('host')}/me`
+    await new Email(newUser, url).sendWelcome()
+  */
+
   createSendToken(newUser, 201, res);
 
   next();
@@ -143,6 +149,12 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       subject: 'Your password reset token (valid for 10 min)',
       message,
     });
+
+    /*
+      this would replace the above await sendEmail if we had pug template
+
+      await new Email(user, resetURL).sendPasswordReset()
+    */
 
     res
       .status(200)
