@@ -13,6 +13,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./controllers/bookingController');
 
 const app = express();
 
@@ -39,7 +40,15 @@ const limiter = rateLimit({
 
 app.use('/api', limiter); // apply this limiter only to /api routes
 
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout,
+); // we define this here instead of the bookings router as we did for the other requests because we need the response to NOT be in JSON
+
 app.use(express.json({ limit: '10kb' })); // req.bodies larger than 10kb will not be accepted
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+// cookieparser
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
