@@ -10,6 +10,7 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
 
 const app = express();
 
@@ -71,6 +72,7 @@ app.use((req, res, next) => {
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/bookings', bookingRouter);
 // ONLY if neither the tour or user controllers have been able to handle the request, use the following wildcard error middleware to cover all cases for all requests where the requested URL doesn't exist
 // This is why middleware order definition is extremely important
 app.all('*', (req, res, next) => {
