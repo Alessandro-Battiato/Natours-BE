@@ -6,6 +6,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const compression = require('compression');
+const cors = require('cors');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -16,6 +17,10 @@ const bookingRouter = require('./routes/bookingRoutes');
 const app = express();
 
 app.enable('trust proxy');
+
+app.use(cors()); // allows CORS for ALL of the requests, if you want to enable CORS for specific routes then you SHOULD NOT set this middleware here
+// you should use cors() before the related routes, for instance: app.use('/api/v1/tours', cors(), tourRouter);
+app.options('*', cors());
 
 // Set security HTTP headers
 app.use(helmet());
