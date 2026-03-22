@@ -15,6 +15,8 @@ const bookingRouter = require('./routes/bookingRoutes');
 
 const app = express();
 
+app.enable('trust proxy');
+
 // Set security HTTP headers
 app.use(helmet());
 
